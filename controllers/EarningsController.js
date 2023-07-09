@@ -6,18 +6,19 @@ const getCryptoCurrencyEarnings = async (request, response, next) => {
     const MessariApi = new MessariApiService();
     let appCryptoAssets = await MessariApi.getAppCryptoAssetsPriceUsd();
     const earningsDetail = {};
-    let earningTotal = usdValue;
+    let earningTotal = 0;
     for (const currentAppCryptoAsset of appCryptoAssets) {
-      const earningCoin = usdValue *
-        (1 + currentAppCryptoAsset.monthlyReturn) ** 12;
-      const earningBalance = usdValue + earningCoin *
-        currentAppCryptoAsset.priceUsd;
-      earningTotal += earningBalance;
+      const buyCoinValue = usdValue / currentAppCryptoAsset.priceUsd;
+      const yearCoinValue = currentAppCryptoAsset.priceUsd +
+        (currentAppCryptoAsset.priceUsd * currentAppCryptoAsset.monthlyReturn *
+          12);
+      const yearEarningUsdValue = buyCoinValue * yearCoinValue;
+      earningTotal += (yearEarningUsdValue - usdValue);
       earningsDetail[currentAppCryptoAsset.symbol] = {
         coinPriceUsd: currentAppCryptoAsset.priceUsd,
         monthlyReturn: currentAppCryptoAsset.monthlyReturn,
-        earningCoin,
-        earningBalance,
+        earningCoin: yearCoinValue,
+        earningBalance: yearEarningUsdValue,
       };
     }
     response.status(200).json({
