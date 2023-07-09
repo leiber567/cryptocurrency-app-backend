@@ -3,6 +3,7 @@ const APP_CRYPTOS_DATA = [
   { symbol: 'ETH', slug: 'ethereum', monthlyReturn: 0.042 },
   { symbol: 'ADA', slug: 'cardano', monthlyReturn: 0.01 },
 ];
+
 const APP_CRYPTOS_SYMBOL = APP_CRYPTOS_DATA.map(
   appCryptoData => appCryptoData.symbol,
 );
