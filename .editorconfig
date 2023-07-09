@@ -1,0 +1,23 @@
+# General rules
+root = true
+
+# Indentation spaces (e.g., 4 spaces)
+[*]
+indent_style = space
+indent_size = 2
+
+# End-of-line style (e.g. LF for Unix)
+[*]
+end_of_line = lf
+
+# Character encoding (e.g. UTF-8)
+[*]
+charset = utf-8
+
+# Automatic trimming of blank spaces at the end of lines
+[*]
+trim_trailing_whitespace = true
+
+# Use of a blank line at the end of the file
+[*]
+insert_final_newline = true
