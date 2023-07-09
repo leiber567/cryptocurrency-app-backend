@@ -1,13 +1,39 @@
-const APP_CRYPTOS_DATA = [
-  { symbol: 'BTC', slug: 'bitcoin', monthlyReturn: 0.05 },
-  { symbol: 'ETH', slug: 'ethereum', monthlyReturn: 0.042 },
-  { symbol: 'ADA', slug: 'cardano', monthlyReturn: 0.01 },
-];
+const fs = require('fs');
+const path = require('path');
+const cryptoCurrenciesFilePath = path.join(__dirname, 'cryptocurrencies.csv');
 
-const APP_CRYPTOS_SYMBOL = APP_CRYPTOS_DATA.map(
+const readCryptocurrenciesData = () => {
+  return new Promise((resolve) => {
+    fs.readFile(cryptoCurrenciesFilePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading crypto currencies:', err);
+        resolve([]);
+      } else {
+        const lines = data.split('\n');
+        const headers = lines[0].split(',');
+        const result = [];
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',');
+          if (values.length === headers.length) {
+            const obj = {};
+            for (let j = 0; j < headers.length; j++) {
+              obj[headers[j]] = values[j];
+            }
+            result.push(obj);
+          }
+        }
+        resolve(result);
+      }
+    });
+  });
+};
+
+const getAppCryptosData = async () => await readCryptocurrenciesData();
+
+const getAppCryptosSymbol = async () => (await readCryptocurrenciesData()).map(
   appCryptoData => appCryptoData.symbol,
 );
-const APP_CRYPTOS_SLUG = APP_CRYPTOS_DATA.map(
+const getAppCryptosSlug = async () => (await readCryptocurrenciesData()).map(
   appCryptoData => appCryptoData.slug,
 );
 const MESSARI_API_BASE_URL = process.env.MESSARI_API_BASE_URL;
@@ -16,9 +42,9 @@ const MESSARI_ASSETS_PATH = '/v2/assets?fields=id,slug,symbol,metrics/market_dat
 const MESSARI_ASSETS_MARKETS_PATH = '/v1/markets/prices-legacy';
 
 module.exports = {
-  APP_CRYPTOS_DATA,
-  APP_CRYPTOS_SYMBOL,
-  APP_CRYPTOS_SLUG,
+  getAppCryptosData,
+  getAppCryptosSymbol,
+  getAppCryptosSlug,
   MESSARI_API_BASE_URL,
   MESSARI_IMAGES_BASE_URL,
   MESSARI_ASSETS_PATH,

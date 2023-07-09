@@ -1,8 +1,8 @@
 const axios = require('axios');
 const {
-  APP_CRYPTOS_DATA,
-  APP_CRYPTOS_SYMBOL,
-  APP_CRYPTOS_SLUG,
+  getAppCryptosData,
+  getAppCryptosSymbol,
+  getAppCryptosSlug,
   MESSARI_API_BASE_URL,
   MESSARI_ASSETS_PATH,
   MESSARI_ASSETS_MARKETS_PATH
@@ -20,8 +20,9 @@ class MessariApiService {
         `${this.apiUrl}${MESSARI_ASSETS_PATH}`,
       );
       const cryptoAssets = response.data.data;
+      const appCryptosSymbol = await getAppCryptosSymbol();
       return cryptoAssets.filter(
-        currentCryptoAsset => APP_CRYPTOS_SYMBOL.indexOf(
+        currentCryptoAsset => appCryptosSymbol.indexOf(
           currentCryptoAsset.symbol) >= 0,
       );
     } catch (error) {
@@ -31,14 +32,15 @@ class MessariApiService {
 
   async getAppCryptoAssetsPriceUsd () {
     const appCryptoAssets = await this.getAppCryptoAssets();
+    const appCryptosData = await getAppCryptosData();
     return appCryptoAssets.map(currentCryptoAsset => {
-      const cryptoAssetAppData = APP_CRYPTOS_DATA.find(cryptoData =>
+      const cryptoAssetAppData = appCryptosData.find(cryptoData =>
         currentCryptoAsset.symbol === cryptoData.symbol,
       );
       return {
         symbol: currentCryptoAsset.symbol,
         priceUsd: currentCryptoAsset.metrics.market_data.price_usd,
-        monthlyReturn: cryptoAssetAppData ? cryptoAssetAppData.monthlyReturn : 0
+        monthlyReturn: cryptoAssetAppData ? Number(cryptoAssetAppData.monthlyReturn) : 0
       }
     });
   }
@@ -49,8 +51,9 @@ class MessariApiService {
         `${this.apiUrl}${MESSARI_ASSETS_MARKETS_PATH}`,
       );
       const cryptoAssets = response.data.data;
+      const appCryptosSlug = await getAppCryptosSlug();
       return cryptoAssets.filter(
-        currentCryptoAsset => APP_CRYPTOS_SLUG.indexOf(
+        currentCryptoAsset => appCryptosSlug.indexOf(
           currentCryptoAsset.slug) >= 0,
       );
     } catch (error) {
